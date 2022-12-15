@@ -1,25 +1,29 @@
-var express = require('express');
-var app = express();
-var fs = require('fs');
+const express = require("express")
+const app  = express();
+const http = require("http").createServer(app);
+const io   = require("socket.io")(http);
 app.use(express.static('public'));
-const WebSocket = require('ws');
-const wss = new WebSocket.Server({ port: 8000 });
+/**
+ * "/"にアクセスがあったらindex.htmlを返却
+ */
+app.get("/", (req, res)=>{
+  res.sendFile(__dirname + "/index.html");
+});
 
-wss.on('connection', function connection(ws) {
-  ws.on('message', function incoming(message) {
-    console.log('received: %s', message);
-    ws.send('something');
+/**
+ * [イベント] ユーザーが接続
+ */
+io.on("connection", (socket)=>{
+  console.log("ユーザーが接続しました");
+
+  socket.on("post", (msg)=>{
+    io.emit("member-post", msg);
   });
-  ws.send('something');
 });
 
-var listener = app.listen(3000, function() {
-    console.log(listener.address().port);
-});
-app.get('/', function(req, res) {
-    fs.readFile("./index.html", function (err, data) {
-        res.writeHead(200, { "Content-Type": "text/html" });
-        res.write(data);
-        res.end();
-    });
+/**
+ * 3000番でサーバを起動する
+ */
+http.listen(3000, ()=>{
+  console.log("listening on *:3000");
 });

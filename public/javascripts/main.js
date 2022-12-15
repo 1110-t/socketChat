@@ -1,12 +1,26 @@
-let sock = new WebSocket('wss://websocketforkatachi.onrender.com:8000');
+/**
+ * [イベント] フォームが送信された
+ */
+const socket = io();
+document.querySelector("#frm-post").addEventListener("submit", (e)=>{
+  // 規定の送信処理をキャンセル(画面遷移しないなど)
+  e.preventDefault();
 
-sock.addEventListener('open',function(e){
-  console.log('Socket 接続成功');
+  // 入力内容を取得する
+  const msg = document.querySelector("#msg");
+  if( msg.value === "" ){
+    return(false);
+  }
+
+  // Socket.ioサーバへ送信
+  socket.emit("post", {text: msg.value});
+
+  // 発言フォームを空にする
+  msg.value = "";
 });
-sock.addEventListener('message',function(e){
-  console.log(e.data);
-});
-document.getElementById('sample').addEventListener('click',function(e){
-  console.log("send Hello!!");
-  sock.send('hello');
+socket.on("member-post", (msg)=>{
+  const list = document.querySelector("#msglist");
+  const li = document.createElement("li");
+  li.innerHTML = `${msg.text}`;
+  list.insertBefore(li, list.firstChild);
 });
