@@ -1,4 +1,4 @@
-let sock = new WebSocket('ws://websocketforkatachi.onrender.com:8000');
+let sock = new WebSocket('wss://websocketforkatachi.onrender.com:8000');
 
 sock.addEventListener('open',function(e){
   console.log('Socket 接続成功');
